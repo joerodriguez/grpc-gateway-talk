@@ -73,7 +73,7 @@ service API {
 
 ```
 
-Http options are an extension of grpc
+The `google.api.http` options are an extension of grpc
 
 ---
 
@@ -97,14 +97,27 @@ func AppEvents(_ context.Context, req *metrics.AppEventRequest)
 }
 ```
 
-* Http options are an extension of grpc.
-* codes.InvalidArgument maps to http status code 400
+* grpc error codes are mapped to http status codes
 
 ---
 
 # Swagger
 
 <img class="center white-background" src="./swagger.png" style="width: 90%;"/>
+
+---
+# Caveats
+
+#### Query parameters in Swagger [pull request](https://github.com/grpc-ecosystem/grpc-gateway/pull/199/files)
+- Only body parameters are included
+
+
+#### Empty json responses [pull request](https://github.com/golang/protobuf/pull/232)
+
+- `return &AppEventsResponse{ events: []AppEvent{} }`
+- returned JSON is `{}` instead of `{ "events": [] }`
+
+
 
 ---
 
