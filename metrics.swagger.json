@@ -1,0 +1,97 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "metrics.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/app_events/{app_id}": {
+      "get": {
+        "operationId": "AppEvents",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/metricsAppEventResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "app_id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "tags": [
+          "API"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "metricsAppEvent": {
+      "type": "object",
+      "properties": {
+        "application_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "event_name": {
+          "type": "string",
+          "format": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "metricsAppEventRequest": {
+      "type": "object",
+      "properties": {
+        "app_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "from": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The start time of the query as seconds since epoch"
+        },
+        "to": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The end time of the query as seconds since epoch"
+        }
+      }
+    },
+    "metricsAppEventResponse": {
+      "type": "object",
+      "properties": {
+        "Thing": {
+          "type": "string",
+          "format": "string"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/metricsAppEvent"
+          }
+        }
+      }
+    }
+  }
+}

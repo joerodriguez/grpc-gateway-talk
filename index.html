@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>gRPC</title>
     <meta charset="utf-8">
     <style>
-      img.center {
-        display: block;
-        margin-right: auto;
-        margin-left: auto;
-      }
-      img.white-background {
-        background: #fff;
-        padding: 20px 0px 20px 0px;
-      }
-      .remark-slide-content {
-        background: #272822;
-        color: #fff;
-      }
-      h1, h2, a {
-        color: #f3f3f3;
-        line-height: 0.8em;
-      }
-      .footer {
-        position: absolute;
-        bottom: 12px;
-        left: 20px;
-      }
+        img.center {
+            display: block;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        img.white-background {
+            background: #fff;
+            padding: 20px 0px 20px 0px;
+        }
+
+        .remark-slide-content {
+            background: #272822;
+            color: #fff;
+        }
+
+        h1, h2, a {
+            color: #f3f3f3;
+            line-height: 0.8em;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 12px;
+            left: 20px;
+        }
     </style>
-  </head>
-  <body>
-    <textarea id="source">
+</head>
+<body>
+
+<textarea id="source">
 
 class: center, middle
 
@@ -39,11 +44,68 @@ class: center, middle
 
 # What is gRPC Gateway?
 
-<img class="center white-background" src="./lifecycle.png" style="width: 90%;" />
+<img class="center white-background" src="./lifecycle.png" style="width: 90%;"/>
 
 ---
+
+# Define your interface
+
+```protobuf
+message AppEventRequest {
+  string app_id = 1;
+  ...
+}
+
+message AppEventResponse {
+  repeated AppEvent events = 1;
+}
+message AppEvent {
+  int32 timestamp = 2;
+  string application_id = 6;
+  string event_name = 7;
+}
+
+service API {
+  rpc AppEvents(AppEventRequest) returns (AppEventResponse) {
+    option (google.api.http).get = "/v1/app_events/{app_id}";
+  }
+}
+
+```
+
+Http options are an extension of grpc
+
+---
+
+# Implementation
+
+```golang
+func AppEvents(_ context.Context, req *metrics.AppEventRequest)
+    (*metrics.AppEventResponse, error)
+{
+    from := time.Unix(int64(req.From), 0)
+    to := time.Unix(int64(req.To), 0)
+	if from.After(to) {
+		return nil, grpc.Errorf(codes.InvalidArgument,
+                                "'from' must be before 'to'")
+	}
+	events, err := appEvents.List(req.AppId, from, to)
+	if err != nil {
+		return nil, err
+	}
+	return &metrics.AppEventResponse{Events: events}, nil
+}
+```
+
+* Http options are an extension of grpc.
+* codes.InvalidArgument maps to http status code 400
+
+---
+
 # Swagger
-      
+
+<img class="center white-background" src="./swagger.png" style="width: 90%;"/>
+
 ---
 
 # Resources
@@ -51,13 +113,14 @@ class: center, middle
 - [grpc gateway](https://github.com/grpc-ecosystem/grpc-gateway) - source
 - [core os tutorial](https://coreos.com/blog/gRPC-protobufs-swagger.html) - Take a REST with HTTP/2, Protobufs, and Swagger
 
-    </textarea>
-    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
-    </script>
-    <script>
-      var slideshow = remark.create({
+</textarea>
+
+<script src="https://remarkjs.com/downloads/remark-latest.min.js">
+</script>
+<script>
+    var slideshow = remark.create({
         highlightLines: 'true',
-      });
-    </script>
-  </body>
+    });
+</script>
+</body>
 </html>
